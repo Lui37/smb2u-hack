@@ -98,6 +98,28 @@ incsrc "edits.asm"
 ; VerticalLevel_Loop
 %org($0F, $E4E2)
 		jsr level_load_finished_hijack
+		
+; EndOfLevelSlotMachine
+%org($0F, $E7C0)
+		jsr load_bonus_chance_hijack
+		
+%org($0F, $E7D4)
+		jsr enable_nmi_8x8
+		
+%org($0F, $E7DF)
+		jsr disable_nmi_8x8
+		
+%org($0F, $EA68)
+		lda #$40
+		sta $0100
+		jsr enable_nmi_8x8
+		jmp $EAAB
+		
+%org($0F, $E788)
+		jsr warp_hijack
+		
+		
+		
 
 ; unused space
 %org($0F, $ED4D)
@@ -244,7 +266,16 @@ level_load_hijack:
 		bne .skip_timer_display
 		
 		inc !force_8x8_sprite_size
+		jsr draw_sprite_timers
+				
+	.skip_timer_display:
+		jmp $EAA3
 
+		
+load_bonus_chance_hijack:
+		;jmp draw_sprite_timers
+
+draw_sprite_timers:
 		lda #$3B
 		sta $06FA
 		
@@ -278,43 +309,7 @@ level_load_hijack:
 		lda #!dropped_frames_x_pos
 		sta $01
 		lda !dropped_frames
-		jsr draw_hex_counter
-		
-	.skip_timer_display:
-		jmp $EAA3
-		
-; input:
-; $00 = y pos
-; $01 = x pos
-; $02 = attributes
-; Y = oam index
-draw_decimal_counter:
-		%hex2dec(x)
-		ora #$50
-		sta $0205,y
-		txa
-		ora #$50
-		sta $0201,y
-		
-		lda $00
-		sta $0200,y
-		sta $0204,y
-		
-		lda $01
-		sta $0203,y
-		adc #8
-		sta $0207,y
-		adc #8
-		sta $01
-		
-		lda $02
-		sta $0202,y
-		sta $0206,y
-		
-		tya
-		adc #8
-		tay
-		rts
+		; jmp draw_hex_counter
 		
 draw_hex_counter:
 		tax
@@ -349,6 +344,42 @@ draw_hex_counter:
 		tay
 		rts
 
+		
+; input:
+; $00 = y pos
+; $01 = x pos
+; $02 = attributes
+; Y = oam index
+draw_decimal_counter:
+		%hex2dec(x)
+		ora #$50
+		sta $0205,y
+		txa
+		ora #$50
+		sta $0201,y
+		
+		lda $00
+		sta $0200,y
+		sta $0204,y
+		
+		lda $01
+		sta $0203,y
+		adc #8
+		sta $0207,y
+		adc #8
+		sta $01
+		
+		lda $02
+		sta $0202,y
+		sta $0206,y
+		
+		tya
+		adc #8
+		tay
+		rts
+		
+
+
 
 level_load_finished_hijack:
 		; reload chr banks
@@ -378,5 +409,25 @@ nmi_sprite_size_fix:
 	+
 		lda #$90
 		jmp $EC27
+		
 
+
+warp_hijack:
+		jsr draw_sprite_timers
+		inc !force_8x8_sprite_size
+		;jmp enable_nmi_8x8
+
+enable_nmi_8x8:
+		lda #$90
+		sta $2000
+		sta $FF
+		rts
+
+disable_nmi_8x8:
+		lda #$10
+		sta $2000
+		sta $FF
+		rts
+
+print pc
 warnpc $F000
