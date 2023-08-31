@@ -21,23 +21,27 @@ endmacro
 
 incsrc "edits.asm"
 
+; NMI_Exit
 %org($0F, $EC65)
 		jmp nmi
 
+; WaitForNMILoop
 %org($0F, $EABD)
 		jmp every_frame
 
+; PreStartLevel
 %org($0F, $E270)
 		jsr pre_level_start
 
-; %org($0F, $E46D)
-		; jsr level_init
+; AreaInitialization
 %org($02, $801E)
 		jsr level_init
 
+; AreaSecondaryRoutine
 %org($03, $BE0B)
 		jsr level_tick_hijack
 		
+; PauseScreenLoop
 %org($0F, $E548)
 		jsr pause_hijack
 
