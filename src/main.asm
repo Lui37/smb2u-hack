@@ -30,7 +30,7 @@ endmacro
 !room_timer_minutes		= $05CD
 !reset_level_timer		= $05CE
 !is_first_frame_of_room	= $05CF
-!sprite_chr2_backup		= $05D0
+
 
 incsrc "edits.asm"
 
@@ -234,9 +234,7 @@ level_load_hijack:
 		bne .skip_timer_display
 		
 		inc !force_8x8_sprite_size
-		
-		lda $06FA
-		sta !sprite_chr2_backup
+
 		lda #$3B
 		sta $06FA
 		
@@ -343,8 +341,8 @@ draw_hex_counter:
 
 
 level_load_finished_hijack:
-		lda !sprite_chr2_backup
-		sta $06FA
+		; reload chr banks
+		jsr $FE16
 		
 		; re-enable 8x16 sprite size
 		lda $FF
