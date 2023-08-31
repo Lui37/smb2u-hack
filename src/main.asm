@@ -230,8 +230,8 @@ level_load_hijack:
 		; hide all sprites
 		jsr $ECA0
 		
-		lda !level_timer_reset
-		bne .skip
+		lda !reset_level_timer
+		bne .skip_timer_display
 		
 		inc !force_8x8_sprite_size
 		
@@ -272,7 +272,7 @@ level_load_hijack:
 		lda !dropped_frames
 		jsr draw_hex_counter
 		
-	.skip:
+	.skip_timer_display:
 		jmp $EAA3
 		
 ; input:
