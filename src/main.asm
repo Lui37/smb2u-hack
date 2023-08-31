@@ -5,9 +5,21 @@ macro org(bank, offset)
     base <offset>
 endmacro
 
+macro hex2dec(register)
+		ld<register> #0
+	?loop
+		cmp #10
+		bcc ?done
+		sbc #10
+		in<register>
+		bcs ?loop
+	?done
+endmacro
+
 ; ram defines
 !counter_60hz			= $C5
 !previous_60hz			= $C6
+!force_8x8_sprite_size	= $78
 !real_frames_elapsed	= $05C6
 !dropped_frames			= $05C7
 !level_timer_frames		= $05C8
@@ -18,12 +30,23 @@ endmacro
 !room_timer_minutes		= $05CD
 !reset_level_timer		= $05CE
 !is_first_frame_of_room	= $05CF
+!sprite_chr2_backup		= $06FF
 
 incsrc "edits.asm"
 
 ; NMI_Exit
 %org($0F, $EC65)
 		jmp nmi
+		
+; NMI_AfterBackgroundAttributesUpdate
+%org($0F, $EC22)
+		jmp nmi_sprite_size_fix
+
+; WaitForNMI_TurnOffPPU
+; show sprites during transitions
+%org($0F, $EAA3)
+		lda #$10
+		bne $02
 
 ; WaitForNMILoop
 %org($0F, $EABD)
@@ -45,8 +68,26 @@ incsrc "edits.asm"
 %org($0F, $E548)
 		jsr pause_hijack
 
-org $26010
-		incbin "gfx.chr"
+; StartLevel
+%org($0F, $E43B)
+		jsr level_load_hijack
+		lda #$90
+		
+%org($0F, $E467)
+		nop
+		nop
+		nop
+		
+%org($0F, $E470)
+		lda #$90
+		
+; HorizontalLevel_Loop
+%org($0F, $E48E)
+		jsr level_load_finished_hijack
+		
+; VerticalLevel_Loop
+%org($0F, $E4E2)
+		jsr level_load_finished_hijack
 
 ; unused space
 %org($0F, $ED4D)
@@ -184,5 +225,150 @@ pause_hijack:
 		jsr level_tick
 		jmp $E51D
 		
+		
+level_load_hijack:
+		; hide all sprites
+		jsr $ECA0
+		
+		lda !level_timer_reset
+		bne .skip
+		
+		inc !force_8x8_sprite_size
+		
+		lda $06FA
+		sta !sprite_chr2_backup
+		lda #$3B
+		sta $06FA
+		
+		ldy #$00
+		lda #$10
+		sta $00
+		lda #$C0
+		sta $01
+		lda #%00100001
+		sta $02
+		lda !level_timer_minutes
+		jsr draw_decimal_counter
+		lda !level_timer_seconds
+		jsr draw_decimal_counter
+		lda !level_timer_frames
+		jsr draw_decimal_counter
+		
+		lda #$20
+		sta $00
+		lda #$C0
+		sta $01
+		lda !room_timer_minutes
+		jsr draw_decimal_counter
+		lda !room_timer_seconds
+		jsr draw_decimal_counter
+		lda !room_timer_frames
+		jsr draw_decimal_counter
+		
+		lda #$30
+		sta $00
+		lda #$E0
+		sta $01
+		lda !dropped_frames
+		jsr draw_hex_counter
+		
+	.skip:
+		jmp $EAA3
+		
+; input:
+; $00 = y pos
+; $01 = x pos
+; $02 = attributes
+; Y = oam index
+draw_decimal_counter:
+		%hex2dec(x)
+		ora #$50
+		sta $0205,y
+		txa
+		ora #$50
+		sta $0201,y
+		
+		lda $00
+		sta $0200,y
+		sta $0204,y
+		
+		lda $01
+		sta $0203,y
+		adc #8
+		sta $0207,y
+		adc #8
+		sta $01
+		
+		lda $02
+		sta $0202,y
+		sta $0206,y
+		
+		tya
+		adc #8
+		tay
+		rts
+		
+draw_hex_counter:
+		tax
+		lsr
+		lsr
+		lsr
+		lsr
+		ora #$50
+		sta $0201,y
+		txa
+		and #$0F
+		ora #$50
+		sta $0205,y
+		
+		lda $00
+		sta $0200,y
+		sta $0204,y
+		
+		lda $01
+		sta $0203,y
+		adc #8
+		sta $0207,y
+		adc #8
+		sta $01
+		
+		lda $02
+		sta $0202,y
+		sta $0206,y
+		
+		tya
+		adc #8
+		tay
+		rts
+
+
+level_load_finished_hijack:
+		lda !sprite_chr2_backup
+		sta $06FA
+		
+		; re-enable 8x16 sprite size
+		lda $FF
+		ora #$20
+		sta $2000
+		sta $FF
+		
+		lda #0
+		sta !force_8x8_sprite_size
+		
+		; hide all sprites
+		jsr $ECA0
+
+		; WaitForNMI_TurnOnPPU
+		jmp $EAA7
+
+
+nmi_sprite_size_fix:
+		jsr $EC68
+		lda !force_8x8_sprite_size
+		bne +
+		jmp $EC25
+	+
+		lda #$90
+		jmp $EC27
 
 warnpc $F000
