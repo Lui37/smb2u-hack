@@ -16,23 +16,37 @@ endmacro
 !room_timer_frames		= $05CB
 !room_timer_seconds		= $05CC
 !room_timer_minutes		= $05CD
+!reset_level_timer		= $05CE
+!is_first_frame_of_room	= $05CF
 
+incsrc "edits.asm"
 
 %org($0F, $EC65)
-		jmp nmi_hijack
+		jmp nmi
 
 %org($0F, $EABD)
 		jmp every_frame
 
+%org($0F, $E270)
+		jsr pre_level_start
+
+; %org($0F, $E46D)
+		; jsr level_init
+%org($02, $801E)
+		jsr level_init
+
 %org($03, $BE0B)
-		jsr level_hijack
+		jsr level_tick_hijack
+		
+%org($0F, $E548)
+		jsr pause_hijack
 
 org $26010
 		incbin "gfx.chr"
 
-; unused space		
+; unused space
 %org($0F, $ED4D)
-nmi_hijack:
+nmi:
 		inc !counter_60hz
 		pla
 		plp
@@ -43,9 +57,7 @@ every_frame:
 		sec
 		sbc !previous_60hz
 		tay
-		
-	; check if we're not in a level if needed
-		
+				
 		clc
 		adc !real_frames_elapsed
 		sta !real_frames_elapsed
@@ -65,7 +77,33 @@ every_frame:
 		bpl -
 		rts
 
-level_hijack:
+
+pre_level_start:
+		inc !reset_level_timer
+		jmp $E1F4
+
+
+level_init:
+		lda #0
+		sta !dropped_frames
+		sta !room_timer_frames
+		sta !room_timer_seconds
+		sta !room_timer_minutes
+		inc !is_first_frame_of_room
+		
+		ldy !reset_level_timer
+		beq +
+		sta !real_frames_elapsed
+		sta !level_timer_frames
+		sta !level_timer_seconds
+		sta !level_timer_minutes
+		sta !reset_level_timer
+	+
+		inc $04AE
+		rts
+		
+
+level_tick:
 	.level_timer_tick:
 		lda !level_timer_frames
 		clc
@@ -95,8 +133,10 @@ level_hijack:
 	..no_cap:
 		sta !level_timer_minutes
 	..done:
-		
+			
 	.room_timer_tick:
+		lda !is_first_frame_of_room
+		bne ..done
 		lda !room_timer_frames
 		clc
 		adc !real_frames_elapsed
@@ -128,8 +168,17 @@ level_hijack:
 	
 		lda #0
 		sta !real_frames_elapsed
-	
+		sta !is_first_frame_of_room
+		rts
+		
+level_tick_hijack:
+		jsr level_tick
 		lda $04C6
 		rts
+		
+pause_hijack:
+		jsr level_tick
+		jmp $E51D
+		
 
 warnpc $F000
