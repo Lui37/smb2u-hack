@@ -31,6 +31,16 @@ endmacro
 !reset_level_timer		= $05CE
 !is_first_frame_of_room	= $05CF
 
+; constants
+!counters_base_x_pos	= $68
+!counters_base_y_pos	= $5F
+!level_timer_x_pos		= !counters_base_x_pos
+!level_timer_y_pos		= !counters_base_y_pos
+!room_timer_x_pos		= !counters_base_x_pos
+!room_timer_y_pos		= !counters_base_y_pos+$10
+!dropped_frames_x_pos	= !counters_base_x_pos+$20
+!dropped_frames_y_pos	= !counters_base_y_pos+$20
+
 
 incsrc "edits.asm"
 
@@ -239,9 +249,9 @@ level_load_hijack:
 		sta $06FA
 		
 		ldy #$00
-		lda #$10
+		lda #!level_timer_y_pos
 		sta $00
-		lda #$C0
+		lda #!level_timer_x_pos
 		sta $01
 		lda #%00100001
 		sta $02
@@ -252,9 +262,9 @@ level_load_hijack:
 		lda !level_timer_frames
 		jsr draw_decimal_counter
 		
-		lda #$20
+		lda #!room_timer_y_pos
 		sta $00
-		lda #$C0
+		lda #!room_timer_x_pos
 		sta $01
 		lda !room_timer_minutes
 		jsr draw_decimal_counter
@@ -263,9 +273,9 @@ level_load_hijack:
 		lda !room_timer_frames
 		jsr draw_decimal_counter
 		
-		lda #$30
+		lda #!dropped_frames_y_pos
 		sta $00
-		lda #$E0
+		lda #!dropped_frames_x_pos
 		sta $01
 		lda !dropped_frames
 		jsr draw_hex_counter
