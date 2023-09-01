@@ -79,11 +79,44 @@ pause_tick:
 		and #$20
 		beq .done
 		
+		; area init flag
+		ldy #0
+		sty $04AE
+		; reset velocity
+		sty $3C
+		sty $46
+		; area, entry page etc (GoToNextLevel)
+		sty $04E6
+		sty $04E8
+		sty $04E9
+		sty $04EA
+		sty $0532
+		sty $0533
+		sty $0534
+		; fix player size
+		iny
+		sty $06F6
 		; set world and level numbers
 		ldx $0E
 		stx $0635
 		ldy $0F
 		sty $0531
+		sty $04E7
+		; CurrentLevelRelative
+		tya
+		sec
+		sbc $E012,y
+		sta $0629
+				
+		; destroy all sprites
+		ldx #$08
+		lda #0
+	-	sta $51,x
+		dex
+		bpl -
+		
+		lda #$C0
+		sta $0100
 		
 		; LevelStartCharacterSelectMenu
 		jmp $E425
@@ -142,7 +175,7 @@ update_level_text:
 		lda #$08
 		sta $11
 		rts
-		
+
 		
 world_number_by_level:
 		db 0, 0, 0, 1, 1, 1, 2, 2
