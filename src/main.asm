@@ -52,12 +52,6 @@ incsrc "edits.asm"
 %org($0F, $EC22)
 		jmp nmi_sprite_size_fix
 
-; WaitForNMI_TurnOffPPU
-; show sprites during transitions
-%org($0F, $EAA3)
-		lda #$10
-		bne $02
-
 ; WaitForNMILoop
 %org($0F, $EABD)
 		jmp every_frame
@@ -114,11 +108,29 @@ incsrc "edits.asm"
 		sta $0100
 		jsr enable_nmi_8x8
 		jmp $EAAB
-		
+	
+; DoWorldWarp	
 %org($0F, $E788)
 		jsr warp_hijack
 		
+; InitializeSubArea
+%org($0F, $E5A0)
+		jsr clear_screen_no_sprite_masking
+
+; loc_BANKF_E606
+%org($0F, $E606)
+		jsr sub_area_init
 		
+; loc_BANKF_E627
+%org($0F, $E635)
+		jsr sub_area_begin_exit
+		nop
+		nop
+		nop
+		
+; ExitSubArea_Loop
+%org($0F, $E65F)
+		jsr sub_area_finish_exit
 		
 
 ; unused space
@@ -269,8 +281,11 @@ level_load_hijack:
 		jsr draw_sprite_timers
 				
 	.skip_timer_display:
-		jmp $EAA3
-
+		;jmp turn_off_ppu_except_sprites
+		
+turn_off_ppu_except_sprites:
+		lda #$10
+		jmp $EAA9
 		
 load_bonus_chance_hijack:
 		;jmp draw_sprite_timers
@@ -379,18 +394,12 @@ draw_decimal_counter:
 		rts
 		
 
-
-
+sub_area_finish_exit:
+sub_area_init:
 level_load_finished_hijack:
 		; reload chr banks
 		jsr $FE16
-		
-		; re-enable 8x16 sprite size
-		lda $FF
-		ora #$20
-		sta $2000
-		sta $FF
-		
+
 		lda #0
 		sta !force_8x8_sprite_size
 		
@@ -428,6 +437,26 @@ disable_nmi_8x8:
 		sta $2000
 		sta $FF
 		rts
+
+clear_screen_no_sprite_masking:
+		lda #$10
+		; rest of ClearNametablesAndSprites
+		jsr $EC8C
+		lda #$90
+		sta $2000
+		sta $FF
+		inc !force_8x8_sprite_size
+		
+		jmp draw_sprite_timers
+
+
+sub_area_begin_exit:
+		; hide all sprites
+		jsr $ECA0
+		inc !force_8x8_sprite_size
+		jsr draw_sprite_timers
+		jmp turn_off_ppu_except_sprites
+		
 
 print pc
 warnpc $F000

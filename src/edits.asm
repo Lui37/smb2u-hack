@@ -23,3 +23,10 @@
 		nop
 		nop
 		
+; LoseALife
+; infinite lives
+%org($00, $8A7D)
+		nop
+		nop
+		nop
+		
