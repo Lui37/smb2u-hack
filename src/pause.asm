@@ -85,6 +85,8 @@ pause_tick:
 		; reset velocity
 		sty $3C
 		sty $46
+		; no rockets
+		sty $04c7
 		; area, entry page etc (GoToNextLevel)
 		sty $04E6
 		sty $04E8
