@@ -136,6 +136,11 @@ draw_sprite_timers:
 		lda !dropped_frames
 		; jmp draw_hex_counter
 		
+; input:
+; $00 = y pos
+; $01 = x pos
+; $02 = attributes
+; Y = oam index
 draw_hex_counter:
 		tax
 		lsr

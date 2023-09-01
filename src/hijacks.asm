@@ -25,18 +25,16 @@
 		jsr level_tick
 		
 ; PauseScreenLoop
-%org($0F, $E548)
-		jsr pause_tick
+%org($0F, $E51D)
+		jsr pause_init
+		nop
+%org($0F, $E539)
+		jmp pause_tick
 
 ; StartLevel
 %org($0F, $E43B)
 		jsr level_load_hijack
 		lda #$90
-		
-%org($0F, $E467)
-		nop
-		nop
-		nop
 		
 %org($0F, $E470)
 		lda #$90
@@ -52,13 +50,10 @@
 ; EndOfLevelSlotMachine
 %org($0F, $E7C0)
 		jsr bonus_chance_load
-		
 %org($0F, $E7D4)
 		jsr enable_nmi_8x8
-		
 %org($0F, $E7DF)
 		jsr disable_nmi_8x8
-		
 %org($0F, $EA68)
 		lda #$40
 		sta $0100

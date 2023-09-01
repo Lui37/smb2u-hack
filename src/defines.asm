@@ -40,3 +40,5 @@ endmacro
 !room_timer_y_pos		= !counters_base_y_pos+$10
 !dropped_frames_x_pos	= !counters_base_x_pos+$20
 !dropped_frames_y_pos	= !counters_base_y_pos+$20
+!level_select_holdoff	= $09
+!level_select_speed		= $02

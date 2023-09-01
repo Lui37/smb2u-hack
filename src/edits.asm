@@ -30,3 +30,9 @@
 		nop
 		nop
 		
+; StartLevel
+%org($0F, $E467)
+		nop
+		nop
+		nop
+		

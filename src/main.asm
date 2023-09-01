@@ -10,8 +10,11 @@ incsrc "nmi.asm"
 incsrc "every_frame.asm"
 incsrc "load_screens.asm"
 incsrc "level.asm"
-incsrc "pause.asm"
-incsrc "ending.asm"
-
 print pc
 warnpc $F000
+
+%org($0F, $FB36)
+incsrc "pause.asm"
+incsrc "ending.asm"
+print pc
+warnpc $FE00
