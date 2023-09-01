@@ -208,3 +208,18 @@ draw_decimal_counter:
 		tay
 		rts
 		
+		
+pre_ending_scene:
+		; hide all sprites
+		jsr $ECA0
+		inc !force_8x8_sprite_size
+		jsr draw_sprite_timers
+		; play jingle
+		lda #$01
+		sta $0603
+		; Delay160Frames
+		jsr $E94A
+		lda #0
+		sta !force_8x8_sprite_size
+		jmp $E956
+		

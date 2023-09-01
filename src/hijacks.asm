@@ -47,6 +47,10 @@
 %org($0F, $E4E2)
 		jsr level_load_finished
 		
+; EndOfLevel
+%org($0F, $E7B1)
+		jmp pre_ending_scene
+		
 ; EndOfLevelSlotMachine
 %org($0F, $E7C0)
 		jsr bonus_chance_load

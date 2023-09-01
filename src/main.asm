@@ -15,6 +15,5 @@ warnpc $F000
 
 %org($0F, $FB36)
 incsrc "pause.asm"
-incsrc "ending.asm"
 print pc
 warnpc $FE00
