@@ -109,7 +109,7 @@ draw_sprite_timers:
 		sta $00
 		lda #!level_timer_x_pos
 		sta $01
-		lda #%00100001
+		lda #%00000001
 		sta $02
 		lda !level_timer_minutes
 		jsr draw_decimal_counter
