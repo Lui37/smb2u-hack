@@ -102,7 +102,9 @@ pause_tick:
 		; reset x/y velocity
 		sty $3C
 		; no rockets
-		sty $04c7
+		sty $04C7
+		; reset veggie thrower
+		sty $04F9
 		; area, entry page etc (GoToNextLevel)
 		sty $04E6
 		sty $04E8
