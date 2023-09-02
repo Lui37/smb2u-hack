@@ -79,12 +79,28 @@ pause_tick:
 		and #$20
 		beq .done
 		
-		; area init flag
-		ldy #0
-		sty $04AE
-		; reset velocity
+		; ResetAreaAndProcessGameMode
+		; ResetAreaAndProcessGameMode_NotTitleCard
+		jsr $F6DA
+		ldy #$0
+		sty $04EC
+		sty $04E0
+		sty $062C
+		sty $062A
+		sty $04FF
+		sty $06F6
+		
+		lda #$1F
+		sta $04C2
+		sty $04C3
+		sty $04B0
+		sty $0620
+		sty $04FB
+		sty $04FC
+		sty $0621
+		
+		; reset x/y velocity
 		sty $3C
-		sty $46
 		; no rockets
 		sty $04c7
 		; area, entry page etc (GoToNextLevel)
@@ -95,9 +111,9 @@ pause_tick:
 		sty $0532
 		sty $0533
 		sty $0534
-		; fix player size
-		iny
-		sty $06F6
+		
+		jsr $F1E1
+		
 		; set world and level numbers
 		ldx $0E
 		stx $0635
