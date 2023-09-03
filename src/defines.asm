@@ -16,29 +16,80 @@ macro hex2dec(register)
 	?done
 endmacro
 
-; ram defines
-!counter_60hz			= $C5
-!previous_60hz			= $C6
-!force_8x8_sprite_size	= $78
-!real_frames_elapsed	= $05C6
-!dropped_frames			= $05C7
-!level_timer_frames		= $05C8
-!level_timer_seconds	= $05C9
-!level_timer_minutes	= $05CA
-!room_timer_frames		= $05CB
-!room_timer_seconds		= $05CC
-!room_timer_minutes		= $05CD
-!reset_level_timer		= $05CE
-!is_first_frame_of_room	= $05CF
+; new ram
+!counter_60hz				= $C5
+!previous_60hz				= $C6
+!force_8x8_sprite_size		= $78
+!real_frames_elapsed		= $05C6
+!dropped_frames				= $05C7
+!level_timer_frames			= $05C8
+!level_timer_seconds		= $05C9
+!level_timer_minutes		= $05CA
+!room_timer_frames			= $05CB
+!room_timer_seconds			= $05CC
+!room_timer_minutes			= $05CD
+!reset_level_timer			= $05CE
+!is_first_frame_of_room		= $05CF
+
+; ram
+!vram_update_index			= $11
+!player_x_velocity			= $3C
+!sprite_state				= $51
+!player_y_velocity			= $46
+!nmi_flag					= $EB
+!input_abetudlr_frame		= $F5
+!input_abetudlr_hold		= $F7
+!game_mode_0100				= $0100
+!is_area_initialized		= $04AE
+!is_lock_open				= $04B0
+!player_health				= $04C2
+!player_max_health			= $04C3
+!sky_flash_timer			= $04C6
+!is_player_in_rocket		= $04C7
+!star_timer					= $04E0
+!player_state_init			= $04E6
+!current_level_init			= $04E7
+!current_room_init			= $04E8
+!current_entry_page_init	= $04E9
+!transition_type_init		= $04EA
+!game_mode					= $04EC
+!veggie_thrower_counter		= $04F9
+!is_mushroom_1_obtained		= $04FB
+!is_mushroom_2_obtained		= $04FC
+!stopwatch_timer			= $04FF
+!current_level				= $0531
+!current_room				= $0532
+!current_entry_page			= $0533
+!transition_type			= $0534
+!is_1up_obtained			= $0620
+!subspace_visit_count		= $0621
+!current_level_relative		= $0629
+!cherry_count				= $062A
+!big_veggies_pulled			= $062C
+!current_world				= $0635
+!player_size				= $06F6
+
+; sram
+!titlecard_level_dots		= $716B
+!titlecard_world			= $717D
+!titlecard_level			= $717F
+
+; rom
+world_starting_level		= $E012 ; WorldStartingLevel
+character_select_menu		= $E425 ; LevelStartCharacterSelectMenu
+hide_all_sprites			= $ECA0 ; HideAllSprites
+level_initialization		= $F1E1 ; LevelInitialization
+do_area_reset				= $F6DA ; DoAreaReset
+load_world_chr_banks		= $FE16 ; LoadWorldCHRBanks
 
 ; constants
-!counters_base_x_pos	= $68
-!counters_base_y_pos	= $5F
-!level_timer_x_pos		= !counters_base_x_pos
-!level_timer_y_pos		= !counters_base_y_pos
-!room_timer_x_pos		= !counters_base_x_pos
-!room_timer_y_pos		= !counters_base_y_pos+$10
-!dropped_frames_x_pos	= !counters_base_x_pos+$20
-!dropped_frames_y_pos	= !counters_base_y_pos+$20
-!level_select_holdoff	= $09
-!level_select_speed		= $02
+!counters_base_x_pos		= $68
+!counters_base_y_pos		= $5F
+!level_timer_x_pos			= !counters_base_x_pos
+!level_timer_y_pos			= !counters_base_y_pos
+!room_timer_x_pos			= !counters_base_x_pos
+!room_timer_y_pos			= !counters_base_y_pos+$10
+!dropped_frames_x_pos		= !counters_base_x_pos+$20
+!dropped_frames_y_pos		= !counters_base_y_pos+$20
+!level_select_holdoff		= $09
+!level_select_speed			= $02

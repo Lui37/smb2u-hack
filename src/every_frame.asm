@@ -22,6 +22,6 @@ every_frame:
 		sta !previous_60hz
 		
 	; wait for nmi loop
-	-	lda $EB
+	-	lda !nmi_flag
 		bpl -
 		rts

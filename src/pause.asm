@@ -3,11 +3,11 @@
 pause_init:
 		; draw PAUSE text which will be static
 		lda #$0D
-		sta $11
+		sta !vram_update_index
 		; initalize selected level
-		lda $0635
+		lda !current_world
 		sta $0E
-		lda $0531
+		lda !current_level
 		sta $0F
 		; initialize up/down hold counters
 		lda #!level_select_holdoff
@@ -21,9 +21,9 @@ pause_tick:
 		
 		; press up/down to select a level
 		lda #$08
-		bit $F7
+		bit !input_abetudlr_hold
 		beq .not_holding_up
-		bit $F5
+		bit !input_abetudlr_frame
 		bne .inc_level
 		; increase level every so often when holding up
 		dec $0C
@@ -31,7 +31,6 @@ pause_tick:
 		lda #!level_select_speed
 		sta $0C
 	.inc_level:
-		sta $06FF
 		ldx $0F
 		inx
 		cpx #$14
@@ -47,9 +46,9 @@ pause_tick:
 		sta $0C
 		
 		lda #$04
-		bit $F7
+		bit !input_abetudlr_hold
 		beq .not_holding_down
-		bit $F5
+		bit !input_abetudlr_frame
 		bne .dec_level
 		; decrease level every so often when holding down
 		dec $0D
@@ -75,71 +74,71 @@ pause_tick:
 		
 		; press select to warp to selected level
 	.check_warp
-		lda $F5
+		lda !input_abetudlr_frame
 		and #$20
 		beq .done
 		
-		; ResetAreaAndProcessGameMode
-		; ResetAreaAndProcessGameMode_NotTitleCard
-		jsr $F6DA
+		; see ResetAreaAndProcessGameMode
+		; and ResetAreaAndProcessGameMode_NotTitleCard
+		jsr do_area_reset
 		ldy #$0
-		sty $04EC
-		sty $04E0
-		sty $062C
-		sty $062A
-		sty $04FF
-		sty $06F6
+		sty !game_mode
+		sty !star_timer
+		sty !big_veggies_pulled
+		sty !cherry_count
+		sty !stopwatch_timer
+		sty !player_size
 		
 		lda #$1F
-		sta $04C2
-		sty $04C3
-		sty $04B0
-		sty $0620
-		sty $04FB
-		sty $04FC
-		sty $0621
+		sta !player_health
+		sty !player_max_health
+		sty !is_lock_open
+		sty !is_1up_obtained
+		sty !is_mushroom_1_obtained
+		sty !is_mushroom_2_obtained
+		sty !subspace_visit_count
 		
 		; reset x/y velocity
-		sty $3C
+		sty !player_x_velocity
+		sty !player_y_velocity
 		; no rockets
-		sty $04C7
+		sty !is_player_in_rocket
 		; reset veggie thrower
-		sty $04F9
+		sty !veggie_thrower_counter
 		; area, entry page etc (GoToNextLevel)
-		sty $04E6
-		sty $04E8
-		sty $04E9
-		sty $04EA
-		sty $0532
-		sty $0533
-		sty $0534
+		sty !player_state_init
+		sty !current_room_init
+		sty !current_entry_page_init
+		sty !transition_type_init
+		sty !current_room
+		sty !current_entry_page
+		sty !transition_type
 		
-		jsr $F1E1
+		jsr level_initialization
 		
 		; set world and level numbers
 		ldx $0E
-		stx $0635
+		stx !current_world
 		ldy $0F
-		sty $0531
-		sty $04E7
+		sty !current_level
+		sty !current_level_init
 		; CurrentLevelRelative
 		tya
 		sec
-		sbc $E012,y
-		sta $0629
+		sbc world_starting_level,y
+		sta !current_level_relative
 				
 		; destroy all sprites
 		ldx #$08
 		lda #0
-	-	sta $51,x
+	-	sta !sprite_state,x
 		dex
 		bpl -
 		
 		lda #$C0
-		sta $0100
+		sta !game_mode_0100
 		
-		; LevelStartCharacterSelectMenu
-		jmp $E425
+		jmp character_select_menu
 		
 	.done:
 		jmp $E521
@@ -154,12 +153,12 @@ update_level_text:
 		inx
 		txa
 		ora #$D0
-		sta $717D
+		sta !titlecard_world
 		
 		; clear level dots
 		ldy #$06
 		lda #$FB
-	-	sta $716B,y
+	-	sta !titlecard_level_dots,y
 		dey
 		bpl -
 		
@@ -167,16 +166,16 @@ update_level_text:
 		ldy $0E
 		lda $0F
 		sec
-		sbc $E012,y
+		sbc world_starting_level,y
 		sta $0B
 		clc
 		adc #$D1
-		sta $717F
+		sta !titlecard_level
 		
 		; level dots
-		lda $E012+1,y
+		lda world_starting_level+1,y
 		sec
-		sbc $E012,y
+		sbc world_starting_level,y
 		sta $03
 		ldx #0
 		ldy #0
@@ -184,7 +183,7 @@ update_level_text:
 		cpx $0B
 		bne +
 		lda #$F6
-	+	sta $716B,y
+	+	sta !titlecard_level_dots,y
 		iny
 		iny
 		inx
@@ -193,7 +192,7 @@ update_level_text:
 		
 		; screen update
 		lda #$08
-		sta $11
+		sta !vram_update_index
 		rts
 
 		

@@ -21,13 +21,13 @@ level_init:
 		sta !level_timer_minutes
 		sta !reset_level_timer
 	+
-		inc $04AE
+		inc !is_area_initialized
 		rts
 		
 		
 level_load_hijack:
 		; hide all sprites
-		jsr $ECA0
+		jsr hide_all_sprites
 		
 		lda !reset_level_timer
 		bne .skip_timer_display
@@ -55,8 +55,7 @@ sub_area_load:
 		
 
 sub_area_begin_exit:
-		; hide all sprites
-		jsr $ECA0
+		jsr hide_all_sprites
 		inc !force_8x8_sprite_size
 		jsr draw_sprite_timers
 		jmp turn_off_ppu_except_sprites
@@ -65,14 +64,12 @@ sub_area_begin_exit:
 sub_area_finish_exit:
 sub_area_init:
 level_load_finished:
-		; reload chr banks
-		jsr $FE16
+		jsr load_world_chr_banks
 
 		lda #0
 		sta !force_8x8_sprite_size
 		
-		; hide all sprites
-		jsr $ECA0
+		jsr hide_all_sprites
 
 		; WaitForNMI_TurnOnPPU
 		jmp $EAA7
@@ -210,8 +207,7 @@ draw_decimal_counter:
 		
 		
 pre_ending_scene:
-		; hide all sprites
-		jsr $ECA0
+		jsr hide_all_sprites
 		inc !force_8x8_sprite_size
 		jsr draw_sprite_timers
 		; play jingle

@@ -2,7 +2,7 @@
 
 level_tick:
 		jsr update_timers
-		lda $04C6
+		lda !sky_flash_timer
 		rts
 
 update_timers:

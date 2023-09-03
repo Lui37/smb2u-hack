@@ -60,7 +60,7 @@
 		jsr disable_nmi_8x8
 %org($0F, $EA68)
 		lda #$40
-		sta $0100
+		sta !game_mode_0100
 		jsr enable_nmi_8x8
 		jmp $EAAB
 	
