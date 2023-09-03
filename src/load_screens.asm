@@ -6,7 +6,6 @@ pre_level_start:
 
 
 level_init:
-		lda #0
 		sta !dropped_frames
 		sta !room_timer_frames
 		sta !room_timer_seconds
@@ -22,22 +21,20 @@ level_init:
 		sta !reset_level_timer
 	+
 		inc !is_area_initialized
+		sta $06FF
 		rts
 		
 		
 level_load_hijack:
-		; hide all sprites
 		jsr hide_all_sprites
-		
 		lda !reset_level_timer
 		bne .skip_timer_display
-		
 		inc !force_8x8_sprite_size
 		jsr draw_sprite_timers
-				
 	.skip_timer_display:
-		;jmp turn_off_ppu_except_sprites
-
+		; jmp turn_off_ppu_except_sprites
+		
+		
 turn_off_ppu_except_sprites:
 		lda #$10
 		jmp $EAA9
@@ -48,7 +45,7 @@ sub_area_load:
 		; rest of ClearNametablesAndSprites
 		jsr $EC8C
 		lda #$90
-		sta $2000
+		sta !ppu_ctrl
 		sta $FF
 		inc !force_8x8_sprite_size
 		jmp draw_sprite_timers
@@ -65,38 +62,36 @@ sub_area_finish_exit:
 sub_area_init:
 level_load_finished:
 		jsr load_world_chr_banks
-
 		lda #0
 		sta !force_8x8_sprite_size
-		
 		jsr hide_all_sprites
-
-		; WaitForNMI_TurnOnPPU
-		jmp $EAA7
+		jmp wait_for_nmi_turn_on_ppu
 
 
 warp_load:
 		jsr draw_sprite_timers
 		inc !force_8x8_sprite_size
-		;jmp enable_nmi_8x8
-
+		; jmp enable_nmi_8x8
+		
+		
 enable_nmi_8x8:
 		lda #$90
-		sta $2000
+		sta !ppu_ctrl
 		sta $FF
 		rts
 
 
 disable_nmi_8x8:
 		lda #$10
-		sta $2000
+		sta !ppu_ctrl
 		sta $FF
 		rts
 
 		
 bonus_chance_load:
-		;jmp draw_sprite_timers
-		
+		; jmp draw_sprite_timers
+
+
 draw_sprite_timers:
 		lda #$3B
 		sta $06FA
@@ -106,7 +101,7 @@ draw_sprite_timers:
 		sta $00
 		lda #!level_timer_x_pos
 		sta $01
-		lda #%00000001
+		lda #!counters_attributes
 		sta $02
 		lda !level_timer_minutes
 		jsr draw_decimal_counter
@@ -212,9 +207,8 @@ pre_ending_scene:
 		jsr draw_sprite_timers
 		; play jingle
 		lda #$01
-		sta $0603
-		; Delay160Frames
-		jsr $E94A
+		sta !music_queue_2
+		jsr delay_160_frames
 		lda #0
 		sta !force_8x8_sprite_size
 		jmp $E956

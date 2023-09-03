@@ -36,12 +36,21 @@ endmacro
 !player_x_velocity			= $3C
 !sprite_state				= $51
 !player_y_velocity			= $46
+!current_character			= $8F
+!sprite_id					= $90
+!player_holding_item		= $9C
+!sprite_grab_timer			= $A8
 !nmi_flag					= $EB
 !input_abetudlr_frame		= $F5
 !input_abetudlr_hold		= $F7
 !game_mode_0100				= $0100
+!player_lock				= $041B
+!carried_sprite_index		= $042D
+!sprite_projectile_timer	= $042F
 !is_area_initialized		= $04AE
+!carried_over_sprite_index	= $04AF
 !is_lock_open				= $04B0
+!door_animation_timer		= $04BD
 !player_health				= $04C2
 !player_max_health			= $04C3
 !sky_flash_timer			= $04C6
@@ -61,6 +70,7 @@ endmacro
 !current_room				= $0532
 !current_entry_page			= $0533
 !transition_type			= $0534
+!music_queue_2				= $0603
 !is_1up_obtained			= $0620
 !subspace_visit_count		= $0621
 !current_level_relative		= $0629
@@ -74,9 +84,14 @@ endmacro
 !titlecard_world			= $717D
 !titlecard_level			= $717F
 
+; regs
+!ppu_ctrl					= $2000
+
 ; rom
 world_starting_level		= $E012 ; WorldStartingLevel
 character_select_menu		= $E425 ; LevelStartCharacterSelectMenu
+wait_for_nmi_turn_on_ppu	= $EAA7 ; WaitForNMI_TurnOnPPU
+delay_160_frames			= $E94A ; Delay160Frames
 hide_all_sprites			= $ECA0 ; HideAllSprites
 level_initialization		= $F1E1 ; LevelInitialization
 do_area_reset				= $F6DA ; DoAreaReset
@@ -85,6 +100,7 @@ load_world_chr_banks		= $FE16 ; LoadWorldCHRBanks
 ; constants
 !counters_base_x_pos		= $68
 !counters_base_y_pos		= $5F
+!counters_attributes		= %00000001
 !level_timer_x_pos			= !counters_base_x_pos
 !level_timer_y_pos			= !counters_base_y_pos
 !room_timer_x_pos			= !counters_base_x_pos

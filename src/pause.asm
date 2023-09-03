@@ -76,10 +76,11 @@ pause_tick:
 	.check_warp
 		lda !input_abetudlr_frame
 		and #$20
-		beq .done
+		bne .warp
+		jmp $E521
 		
+	.warp:
 		; see ResetAreaAndProcessGameMode
-		; and ResetAreaAndProcessGameMode_NotTitleCard
 		jsr do_area_reset
 		ldy #$0
 		sty !game_mode
@@ -87,25 +88,20 @@ pause_tick:
 		sty !big_veggies_pulled
 		sty !cherry_count
 		sty !stopwatch_timer
-		sty !player_size
-		
-		lda #$1F
-		sta !player_health
 		sty !player_max_health
 		sty !is_lock_open
 		sty !is_1up_obtained
 		sty !is_mushroom_1_obtained
 		sty !is_mushroom_2_obtained
 		sty !subspace_visit_count
-		
-		; reset x/y velocity
+		sty !player_lock
+		sty !player_holding_item
+		sty !carried_sprite_index
+		sty !carried_over_sprite_index
 		sty !player_x_velocity
 		sty !player_y_velocity
-		; no rockets
 		sty !is_player_in_rocket
-		; reset veggie thrower
 		sty !veggie_thrower_counter
-		; area, entry page etc (GoToNextLevel)
 		sty !player_state_init
 		sty !current_room_init
 		sty !current_entry_page_init
@@ -113,7 +109,8 @@ pause_tick:
 		sty !current_room
 		sty !current_entry_page
 		sty !transition_type
-		
+		lda #$1F
+		sta !player_health
 		jsr level_initialization
 		
 		; set world and level numbers
@@ -122,7 +119,6 @@ pause_tick:
 		ldy $0F
 		sty !current_level
 		sty !current_level_init
-		; CurrentLevelRelative
 		tya
 		sec
 		sbc world_starting_level,y
@@ -131,17 +127,16 @@ pause_tick:
 		; destroy all sprites
 		ldx #$08
 		lda #0
-	-	sta !sprite_state,x
+	-	sta !sprite_id,x
+		sta !sprite_state,x
+		sta !sprite_grab_timer,x
+		sta !sprite_projectile_timer,x
 		dex
 		bpl -
 		
 		lda #$C0
 		sta !game_mode_0100
-		
 		jmp character_select_menu
-		
-	.done:
-		jmp $E521
 
 
 ; $0E: selected world number
