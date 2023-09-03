@@ -56,6 +56,7 @@ endmacro
 !sky_flash_timer			= $04C6
 !is_player_in_rocket		= $04C7
 !star_timer					= $04E0
+!player_y_velocity_init		= $04E5
 !player_state_init			= $04E6
 !current_level_init			= $04E7
 !current_room_init			= $04E8

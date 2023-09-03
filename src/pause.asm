@@ -100,6 +100,7 @@ pause_tick:
 		sty !carried_over_sprite_index
 		sty !player_x_velocity
 		sty !player_y_velocity
+		sty !player_y_velocity_init
 		sty !is_player_in_rocket
 		sty !veggie_thrower_counter
 		sty !player_state_init
