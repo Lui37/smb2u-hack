@@ -43,6 +43,7 @@ endmacro
 !nmi_flag					= $EB
 !input_abetudlr_frame		= $F5
 !input_abetudlr_hold		= $F7
+!ppu_ctrl_mirror			= $FF
 !game_mode_0100				= $0100
 !player_lock				= $041B
 !carried_sprite_index		= $042D

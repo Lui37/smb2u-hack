@@ -21,7 +21,6 @@ level_init:
 		sta !reset_level_timer
 	+
 		inc !is_area_initialized
-		sta $06FF
 		rts
 		
 		
@@ -46,7 +45,7 @@ sub_area_load:
 		jsr $EC8C
 		lda #$90
 		sta !ppu_ctrl
-		sta $FF
+		sta !ppu_ctrl_mirror
 		inc !force_8x8_sprite_size
 		jmp draw_sprite_timers
 		
@@ -77,14 +76,14 @@ warp_load:
 enable_nmi_8x8:
 		lda #$90
 		sta !ppu_ctrl
-		sta $FF
+		sta !ppu_ctrl_mirror
 		rts
 
 
 disable_nmi_8x8:
 		lda #$10
 		sta !ppu_ctrl
-		sta $FF
+		sta !ppu_ctrl_mirror
 		rts
 
 		
@@ -152,6 +151,7 @@ draw_hex_counter:
 		
 		lda $01
 		sta $0203,y
+		clc
 		adc #8
 		sta $0207,y
 		adc #8
