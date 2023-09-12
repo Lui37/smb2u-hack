@@ -30,6 +30,7 @@ endmacro
 !room_timer_minutes			= $05CD
 !reset_level_timer			= $05CE
 !is_first_frame_of_room		= $05CF
+!dont_reset_level_timer		= $05D0
 
 ; ram
 !vram_update_index			= $11

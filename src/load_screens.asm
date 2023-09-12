@@ -1,8 +1,10 @@
 @include
 
 pre_level_start:
+		lda !dont_reset_level_timer
+		bne +
 		inc !reset_level_timer
-		jmp $E1F4
+	+	jmp $E1F4
 
 
 level_init:
@@ -10,6 +12,7 @@ level_init:
 		sta !room_timer_frames
 		sta !room_timer_seconds
 		sta !room_timer_minutes
+		sta !dont_reset_level_timer
 		inc !is_first_frame_of_room
 		
 		ldy !reset_level_timer

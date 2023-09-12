@@ -26,9 +26,7 @@
 ; LoseALife
 ; infinite lives
 %org($00, $8A7D)
-		nop
-		nop
-		nop
+		inc !dont_reset_level_timer
 		
 ; StartLevel
 %org($0F, $E467)
