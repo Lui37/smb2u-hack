@@ -13,14 +13,14 @@ update_timers:
 		sta !level_timer_frames
 		cmp #60
 		bcc ..done
-		
+	..tick_seconds:
 		sbc #60
 		sta !level_timer_frames
 		lda !level_timer_seconds
 		adc #0
 		sta !level_timer_seconds
 		cmp #60
-		bcc ..done
+		bcc ..check_if_done
 		
 		sbc #60
 		sta !level_timer_seconds
@@ -34,6 +34,12 @@ update_timers:
 		lda #9
 	..no_cap:
 		sta !level_timer_minutes
+		
+	..check_if_done:
+		lda !level_timer_frames
+		cmp #60
+		bcs ..tick_seconds
+		
 	..done:
 			
 	.room_timer_tick:

@@ -110,6 +110,8 @@ pause_tick:
 		sty !current_room
 		sty !current_entry_page
 		sty !transition_type
+		sty !door_animation_timer
+		sty !player_riding_carpet
 		lda #$1F
 		sta !player_health
 		jsr level_initialization

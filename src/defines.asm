@@ -52,6 +52,7 @@ endmacro
 !is_area_initialized		= $04AE
 !carried_over_sprite_index	= $04AF
 !is_lock_open				= $04B0
+!player_riding_carpet		= $04B2
 !door_animation_timer		= $04BD
 !player_health				= $04C2
 !player_max_health			= $04C3
